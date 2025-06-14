@@ -44,44 +44,38 @@ public class Biblioteca {
         return null;
     }
 
-    public void prestarLibro(String titulo, String rut) {
+    public void prestarLibro(String titulo, String rut) throws LibroNoEncontradoException, LibroYaPrestadoException {
+
         Libro libro = buscarLibroPorTitulo(titulo);
         Usuario usuario = usuarios.get(rut);
 
         if (libro == null) {
-            System.out.println("El libro no existe en el sistema.");
-            return;
+            throw new LibroNoEncontradoException("El libro " + titulo + "no existe en el sistema.");
         }
 
         if (usuario == null) {
-            System.out.println("El usuario no esta registrado.");
-            return;
+            throw new IllegalArgumentException("El siguiente rut: " + rut + " no está registrado.");
         }
 
         if (libro.estaPrestado()) {
-            System.out.println("El libro no se encuentra disponible.");
-            return;
+            throw new LibroYaPrestadoException("El libro " + titulo + " ya se encuentra prestado.");
         }
 
         libro.prestar();
-        System.out.println("Libro prestado exitosamente a " + usuario.getNombre());
     }
 
-    public void devolverLibro(String titulo) {
+    public void devolverLibro(String titulo) throws LibroNoEncontradoException {
         Libro libro = buscarLibroPorTitulo(titulo);
 
         if (libro == null) {
-            System.out.println("El libro no existe en el sistema.");
-            return;
+            throw new LibroNoEncontradoException("El libro " + titulo + " no existe en el sistema.");
         }
 
         if (!libro.estaPrestado()) {
-            System.out.println("El libro no está actualmente prestado.");
-            return;
+            throw new IllegalStateException("El libro " + titulo + " se encuentra disponible.");
         }
 
         libro.devolver();
-        System.out.println("Libro devuelto exitosamente.");
     }
 
     public void mostrarLibrosDisponibles() {
