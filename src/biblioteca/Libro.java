@@ -10,6 +10,13 @@ public class Libro {
         this.autor = autor;
         this.prestado = false;
     }
+    
+    public Libro(String titulo, String autor, boolean prestado) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.prestado = prestado;
+    }
+
 
     public String getTitulo() {
         return titulo;

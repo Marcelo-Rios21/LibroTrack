@@ -1,5 +1,11 @@
 package biblioteca;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,6 +96,108 @@ public class Biblioteca {
 
         if (!hayDisponibles) {
             System.out.println("No hay libros disponibles en este momento.");
+        }
+    }
+
+    public void cargarLibrosDesdeArchivos(String archivo) {
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] partes = linea.split(",", 2);
+                if (partes.length == 2) {
+                    String titulo = partes[0].trim();
+                    String autor = partes[1].trim();
+                    Libro libro = new Libro(titulo, autor);
+                    agregarLibro(libro);
+                }
+            }
+            System.out.println("Libros cargados exitosamente desde el archivo.");
+            
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
+        }
+    }
+
+    public void cargarLibrosDesdeCSV(String archivo) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            boolean primeraLinea = true;
+            
+            while ((linea = br.readLine()) != null) {
+                if (primeraLinea) {
+                    primeraLinea = false;
+                    continue;
+                }
+                String[] partes = linea.split(",");
+
+                if (partes.length >= 3) {
+                    String titulo = partes[0].trim();
+                    String autor = partes[1].trim();
+                    boolean prestado = Boolean.parseBoolean(partes[2].trim());
+
+                    Libro libro = new Libro(titulo, autor, prestado);
+                    agregarLibro(libro);
+                }
+            }
+        }
+    }
+
+    public void guardarEstadoEnArchivo(String archivo) {
+
+        File archivoDestino = new File(archivo);
+
+        try {
+            if (archivoDestino.exists() && !archivoDestino.canWrite()) {
+                System.out.println("No se puede escribir en el archivo especificado.");
+                return;
+            }
+        
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(archivo))) {
+                writer.write("-- Libros --");
+                writer.newLine();
+                for (Libro libro : libros) {
+                    writer.write("Titulo: " + libro.getTitulo() +
+                                ", Autor: " + libro.getAutor() +   
+                                ", Estado: " + (libro.estaPrestado() ? "Prestado" : "Disponible"));
+                    writer.newLine();          
+                }
+
+                writer.newLine();
+                writer.write("-- Usuarios --");
+                writer.newLine();
+                for (Usuario usuario : usuarios.values()) {
+                    writer.write("Rut: " + usuario.getRut() + ", Nombre: " + usuario.getNombre());
+                    writer.newLine();
+                }
+
+                System.out.println("Guardado en " + archivo);
+            }
+                
+        } catch (IOException e) {
+            System.out.println("Error al guardar el archivo: " + e.getMessage());
+        }
+    }
+
+    public void mostrarEstadoDesdeArchivo(String archivo) {
+        File archivoDestino = new File(archivo);
+
+        if (!archivoDestino.exists()) {
+            System.out.println("El archivo especificado no existe.");
+            return;
+        }
+
+        if (!archivoDestino.canRead()) {
+            System.out.println("No se tiene permiso para leer el archivo.");
+            return;
+        }
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                System.out.println(linea);
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
         }
     }
 }

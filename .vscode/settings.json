@@ -5,6 +5,11 @@
         "lib/**/*.jar"
     ],
     "files.exclude": {
-        "**/bin": true
+        "**/bin": true,
+        "**/*.class": true
+    },
+    "search.exclude": {
+        "**/bin": true,
+        "**/*.class": true
     }
 }
