@@ -30,15 +30,28 @@ public class Biblioteca {
     }
 
     public void agregarLibro(Libro libro) {
-        if (libro != null && buscarLibroPorTitulo(libro.getTitulo()) == null) {
-            libros.add(libro);
+        if (libro == null) return;
+
+        for (Libro l : libros) {
+            if (l.getTitulo().equalsIgnoreCase(libro.getTitulo())) {
+                System.out.println("El libro ya existe en la biblioteca.");
+                return;
+            }
         }
+
+        libros.add(libro);
+        System.out.println("Libro agregado.");
     }
 
     public void registrarUsuario(Usuario usuario) {
-        if (usuario != null && !usuarios.containsKey(usuario.getRut())) {
-            usuarios.put(usuario.getRut(), usuario);
+        if (usuario == null) return;
+
+        if (usuarios.containsKey(usuario.getRut())) {
+            System.out.println("El rut ya está registrado.");
+            return;
         }
+        usuarios.put(usuario.getRut(), usuario);
+        System.out.println("Usuario registrado.");
     }  
 
     public Libro buscarLibroPorTitulo(String titulo) {
@@ -56,7 +69,7 @@ public class Biblioteca {
         Usuario usuario = usuarios.get(rut);
 
         if (libro == null) {
-            throw new LibroNoEncontradoException("El libro " + titulo + "no existe en el sistema.");
+            throw new LibroNoEncontradoException("El libro " + titulo + " no existe en el sistema.");
         }
 
         if (usuario == null) {
@@ -200,4 +213,39 @@ public class Biblioteca {
             System.out.println("Error al leer el archivo: " + e.getMessage());
         }
     }
+
+    public static boolean validarRUT(String rut) {
+        if (rut == null) return false;
+
+        rut = rut.replace(".", "").toUpperCase();
+
+        if (!rut.matches("^\\d{7,8}-[\\dK]$")) {
+            return false;
+        }
+
+        String[] partes = rut.split("-");
+        String cuerpo = partes[0];
+        String dv = partes[1];
+
+        int suma = 0;
+        int factor = 2;
+
+        for (int i = cuerpo.length() - 1; i >= 0; i--) {
+            suma += Character.getNumericValue(cuerpo.charAt(i)) * factor;
+            factor = (factor == 7) ? 2 : factor + 1;
+        }
+
+        int resto = 11 - (suma % 11);
+        String dvEsperado;
+        if (resto == 11) {
+            dvEsperado = "0";
+        } else if (resto == 10) {
+            dvEsperado = "K";
+        } else {
+            dvEsperado = String.valueOf(resto);
+        }
+
+        return dv.equals(dvEsperado);
+    }
+
 }
