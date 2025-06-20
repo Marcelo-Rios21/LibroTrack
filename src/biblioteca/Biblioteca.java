@@ -8,17 +8,32 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Biblioteca {
     private final List<Libro> libros;
     private final Map<String, Usuario> usuarios;
 
+    private final Set<String> titulosUnicos;
+    private final Set<String> rutsUnicos;
+
+    private final TreeSet<Libro> librosOrdenados;
+    private final TreeSet<Usuario> usuariosOrdenados;
+
 
     public Biblioteca() {
         libros = new ArrayList<>();
         usuarios = new HashMap<>();
+
+        titulosUnicos = new HashSet<>();
+        rutsUnicos = new HashSet<>();
+
+        librosOrdenados = new TreeSet<>();
+        usuariosOrdenados = new TreeSet<>();
     }
 
     public List<Libro> getLibros() {
@@ -32,25 +47,31 @@ public class Biblioteca {
     public void agregarLibro(Libro libro) {
         if (libro == null) return;
 
-        for (Libro l : libros) {
-            if (l.getTitulo().equalsIgnoreCase(libro.getTitulo())) {
-                System.out.println("El libro ya existe en la biblioteca.");
-                return;
-            }
+        String titulo = libro.getTitulo().toLowerCase();
+
+        if (titulosUnicos.contains(titulo)) {
+            System.out.println("El libro ya existe en la biblioteca.");
+            return;
         }
 
         libros.add(libro);
+        titulosUnicos.add(titulo);
+        librosOrdenados.add(libro);
         System.out.println("Libro agregado.");
     }
 
     public void registrarUsuario(Usuario usuario) {
         if (usuario == null) return;
 
-        if (usuarios.containsKey(usuario.getRut())) {
+        String rut = usuario.getRut();
+
+        if (rutsUnicos.contains(rut)) {
             System.out.println("El rut ya está registrado.");
             return;
         }
-        usuarios.put(usuario.getRut(), usuario);
+        usuarios.put(rut, usuario);
+        rutsUnicos.add(rut);
+        usuariosOrdenados.add(usuario);
         System.out.println("Usuario registrado.");
     }  
 
@@ -131,7 +152,13 @@ public class Biblioteca {
         }
     }
 
-    public void cargarLibrosDesdeCSV(String archivo) throws IOException {
+    public void cargarLibrosDesdeCSV(String archivo, boolean limpiarAntes) throws IOException {
+        if (limpiarAntes) {
+            libros.clear();
+            librosOrdenados.clear();
+            titulosUnicos.clear();
+        }
+
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;
             boolean primeraLinea = true;
@@ -211,6 +238,49 @@ public class Biblioteca {
             }
         } catch (IOException e) {
             System.out.println("Error al leer el archivo: " + e.getMessage());
+        }
+    }
+
+    public void cargarUsuariosDesdeCSV(String archivo, boolean limpiarAntes) {
+        if (limpiarAntes) {
+            usuarios.clear();
+            usuariosOrdenados.clear();
+            rutsUnicos.clear();
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivo))){
+            String linea;
+            boolean primeraLinea = true;
+
+            while ((linea = br.readLine()) != null) {
+                if (primeraLinea) {
+                    primeraLinea = false;
+                    continue;
+                }
+                String[] partes = linea.split(",\\s*");
+
+                if (partes.length >= 2) {
+                    String rut = partes[0].trim();
+                    String nombre = partes[1].trim();
+
+                    if (!validarRUT(rut)) {
+                        System.out.println("Rut invalido en archivo: " + rut);
+                        continue;
+                    }
+
+                    if (rutsUnicos.contains(rut)) {
+                        System.out.println("Rut duplicado en archivo: " + rut);
+                        continue;
+                    }
+                    Usuario usuario = new Usuario(rut, nombre);
+                    usuarios.put(rut, usuario);
+                    rutsUnicos.add(rut);
+                    usuariosOrdenados.add(usuario);
+                }
+            }
+            System.out.println("Usuarios cargados con exito desde el archivo.");
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo de usuarios: " + e.getMessage());
         }
     }
 
