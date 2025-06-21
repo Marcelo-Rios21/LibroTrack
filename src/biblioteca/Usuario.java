@@ -27,4 +27,18 @@ public class Usuario implements Comparable<Usuario> {
     public int compareTo(Usuario otro) {
         return this.nombre.compareToIgnoreCase(otro.nombre);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Usuario otro = (Usuario) obj;
+        return this.nombre.equalsIgnoreCase(otro.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return nombre.toLowerCase().hashCode();
+    }
 }

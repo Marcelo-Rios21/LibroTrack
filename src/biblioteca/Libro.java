@@ -48,4 +48,18 @@ public class Libro implements Comparable<Libro> {
     public int compareTo(Libro otro) {
         return this.titulo.compareToIgnoreCase(otro.titulo);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Libro otro = (Libro) obj;
+        return this.titulo.equalsIgnoreCase(otro.titulo);
+    }
+
+    @Override
+    public int hashCode() {
+        return titulo.toLowerCase().hashCode();
+    }
 }
