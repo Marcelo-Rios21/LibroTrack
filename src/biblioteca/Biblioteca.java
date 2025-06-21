@@ -133,6 +133,30 @@ public class Biblioteca {
         }
     }
 
+    public void mostrarLibrosOrdenados() {
+        if (librosOrdenados.isEmpty()) {
+            System.out.println("No hay libros registrados.");
+            return;
+        }
+
+        System.out.println("--- Libros ordenados por titulo ---");
+        for (Libro libro : librosOrdenados) {
+            System.out.println(libro);
+        }
+    }
+
+    public void mostrarUsuariosOrdenados() {
+        if (usuariosOrdenados.isEmpty()) {
+           System.out.println("No hay usuarios registrados."); 
+           return;
+        }
+
+        System.out.println("--- Usuarios ordenados por nombre ---");
+        for (Usuario usuario : usuariosOrdenados) {
+            System.out.println(usuario);
+        }
+    }
+
     public void cargarLibrosDesdeArchivos(String archivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
             String linea;

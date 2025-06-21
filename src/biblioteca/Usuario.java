@@ -1,6 +1,6 @@
 package biblioteca;
 
-public class Usuario {
+public class Usuario implements Comparable<Usuario> {
     private final String rut;
     private final String nombre;
 
@@ -21,5 +21,10 @@ public class Usuario {
     @Override
     public String toString() {
         return "RUT: " + rut + " Nombre: " + nombre;
+    }
+
+    @Override
+    public int compareTo(Usuario otro) {
+        return this.nombre.compareToIgnoreCase(otro.nombre);
     }
 }

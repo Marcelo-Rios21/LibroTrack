@@ -1,6 +1,6 @@
 package biblioteca;
 
-public class Libro {
+public class Libro implements Comparable<Libro> {
     private final String titulo;
     private final String autor;
     private boolean prestado;
@@ -42,5 +42,10 @@ public class Libro {
     public String toString() {
         String estado = prestado ? "Prestado" : "Disponible";
         return "Titulo: " + titulo + " Autor: " + autor + " Estado: " + estado;
+    }
+
+    @Override
+    public int compareTo(Libro otro) {
+        return this.titulo.compareToIgnoreCase(otro.titulo);
     }
 }

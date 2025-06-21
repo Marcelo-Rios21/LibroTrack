@@ -14,9 +14,11 @@ public class Menu {
             System.out.println("2. Agregar libro");
             System.out.println("3. Prestar libro");
             System.out.println("4. Devolver libro");
-            System.out.println("5. Mostrar libros disponibles");
+            System.out.println("5. Libros disponibles");
             System.out.println("6. Guardar estado en archivo");
-            System.out.println("7. Salir");
+            System.out.println("7. Libros ordenados por titulo");
+            System.out.println("8. Usuarios ordenados por nombre");
+            System.out.println("9. Salir");
             System.out.println("Seleccione una opcion: ");
             while (!input.hasNextInt()) {
             System.out.println("Ingrese un numero valido.");
@@ -45,12 +47,18 @@ public class Menu {
                     guardarEstado();
                     break;
                 case 7:
+                    biblioteca.mostrarLibrosOrdenados();
+                    break;
+                case 8:
+                    biblioteca.mostrarUsuariosOrdenados();
+                    break;
+                case 9:
                     System.out.println("Gracias por usar nuestro sistema. Hasta luego!");
                     break;
                 default:
                     System.out.println("Opcion no valida.");
             }
-        } while (opcion != 7);
+        } while (opcion != 9);
     }
 
     private static void registrarUsuario() {
