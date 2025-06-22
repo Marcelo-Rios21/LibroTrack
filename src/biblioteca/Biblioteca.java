@@ -16,7 +16,9 @@ import java.util.TreeSet;
 
 public class Biblioteca {
     private final List<Libro> libros;
+
     private final Map<String, Usuario> usuarios;
+    private final Map<String, Libro> indicePorTitulo;
 
     private final Set<String> titulosUnicos;
     private final Set<String> rutsUnicos;
@@ -27,7 +29,9 @@ public class Biblioteca {
 
     public Biblioteca() {
         libros = new ArrayList<>();
+
         usuarios = new HashMap<>();
+        indicePorTitulo = new HashMap<>();
 
         titulosUnicos = new HashSet<>();
         rutsUnicos = new HashSet<>();
@@ -57,6 +61,7 @@ public class Biblioteca {
         libros.add(libro);
         titulosUnicos.add(titulo);
         librosOrdenados.add(libro);
+        indicePorTitulo.put(titulo, libro);
         System.out.println("Libro agregado.");
     }
 
@@ -76,12 +81,8 @@ public class Biblioteca {
     }  
 
     public Libro buscarLibroPorTitulo(String titulo) {
-        for (Libro libro : libros) {
-            if (libro.getTitulo().equalsIgnoreCase(titulo)) {
-                return libro;
-            }
-        }
-        return null;
+        if (titulo == null) return null;
+        return indicePorTitulo.get(titulo.toLowerCase());
     }
 
     public void prestarLibro(String titulo, String rut) throws LibroNoEncontradoException, LibroYaPrestadoException {
@@ -181,6 +182,7 @@ public class Biblioteca {
             libros.clear();
             librosOrdenados.clear();
             titulosUnicos.clear();
+            indicePorTitulo.clear();
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
