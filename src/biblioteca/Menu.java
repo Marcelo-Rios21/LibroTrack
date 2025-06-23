@@ -1,5 +1,6 @@
 package biblioteca;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Menu {
@@ -7,56 +8,46 @@ public class Menu {
     private static final Biblioteca biblioteca = new Biblioteca();
 
     public static void mostrarMenu() {
-        int opcion;
-        do { 
-            System.out.println("\n----- MENU PRINCIPAL -----");
-            System.out.println("1. Registrar usuario");
-            System.out.println("2. Agregar libro");
-            System.out.println("3. Prestar libro");
-            System.out.println("4. Devolver libro");
-            System.out.println("5. Libros disponibles");
-            System.out.println("6. Guardar estado en archivo");
-            System.out.println("7. Libros ordenados por titulo");
-            System.out.println("8. Usuarios ordenados por nombre");
-            System.out.println("9. Salir");
-            System.out.println("Seleccione una opcion: ");
-            while (!input.hasNextInt()) {
-            System.out.println("Ingrese un numero valido.");
-            input.next();
-            }
-            opcion = input.nextInt();
-            input.nextLine();
+        int opcion = -1;
+        do {
+            try {
+                System.out.println("\n----- MENU PRINCIPAL -----");
+                System.out.println("1. Registrar usuario");
+                System.out.println("2. Agregar libro");
+                System.out.println("3. Prestar libro");
+                System.out.println("4. Devolver libro");
+                System.out.println("5. Libros disponibles");
+                System.out.println("6. Guardar estado en archivo");
+                System.out.println("7. Libros ordenados por titulo");
+                System.out.println("8. Usuarios ordenados por nombre");
+                System.out.println("9. Salir");
+                System.out.println("Seleccione una opcion: ");
 
-            switch (opcion) {
-                case 1:
-                    registrarUsuario();
-                    break;
-                case 2:
-                    agregarLibro();
-                    break;
-                case 3:
-                    prestarLibro();
-                    break;
-                case 4:
-                    devolverLibro();
-                    break;
-                case 5:
-                    biblioteca.mostrarLibrosDisponibles();
-                    break;
-                case 6:
-                    guardarEstado();
-                    break;
-                case 7:
-                    biblioteca.mostrarLibrosOrdenados();
-                    break;
-                case 8:
-                    biblioteca.mostrarUsuariosOrdenados();
-                    break;
-                case 9:
-                    System.out.println("Gracias por usar nuestro sistema. Hasta luego!");
-                    break;
-                default:
-                    System.out.println("Opcion no valida.");
+                if (!input.hasNextInt()) {
+                    System.out.println("Ingrese un numero valido.");
+                    input.nextLine();
+                    continue;
+                }
+                opcion = input.nextInt();
+                input.nextLine();
+
+                switch (opcion) {
+                    case 1 -> registrarUsuario();
+                    case 2 -> agregarLibro();
+                    case 3 -> prestarLibro();                    
+                    case 4 -> devolverLibro();                                        
+                    case 5 -> biblioteca.mostrarLibrosDisponibles();                     
+                    case 6 -> guardarEstado();                   
+                    case 7 -> biblioteca.mostrarLibrosOrdenados();                    
+                    case 8 -> biblioteca.mostrarUsuariosOrdenados();                                          
+                    case 9 -> System.out.println("Gracias por usar nuestro sistema. Hasta luego!");     
+                    default -> System.out.println("Opcion no valida.");             
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Error: " +e.getMessage());
+                input.nextLine();
+            } catch (Exception e) {
+                System.out.println("Error inesperado: " + e.getMessage());
             }
         } while (opcion != 9);
     }
@@ -64,11 +55,16 @@ public class Menu {
     private static void registrarUsuario() {
         System.out.println("Ingrese nombre del usuario: ");
         String nombre = input.nextLine();
-        String rut;
 
+        if (nombre.isEmpty()) {
+            System.out.println("El nombre no puede estar vacio.");
+            return;
+        }
+
+        String rut;
         while (true) {
             System.out.println("Ingrese rut del usuario: ");
-            rut = input.nextLine();
+            rut = input.nextLine().trim();
 
             if (biblioteca.validarRUT(rut)) {
                 break;
@@ -77,29 +73,59 @@ public class Menu {
             }
         }
 
-        Usuario usuario = new Usuario(rut, nombre);
-        biblioteca.registrarUsuario(usuario);
+        try {
+            Usuario usuario = new Usuario(rut, nombre);
+            biblioteca.registrarUsuario(usuario);
+        } catch (Exception e) {
+            System.out.println("Error al registrar usuario: " + e.getMessage());
+        }
     }
 
     private static void agregarLibro() {
         System.out.println("Ingrese el titulo del libro: ");
-        String titulo = input.nextLine();
-        System.out.println("Ingrese el autor del libro: ");
-        String autor = input.nextLine();
+        String titulo = input.nextLine().trim();
+        if (titulo.isEmpty()) {
+            System.out.println("El titulo no puede estar vacio.");
+            return;
+        }
 
-        Libro libro = new Libro(titulo, autor);
-        biblioteca.agregarLibro(libro);
+        System.out.println("Ingrese el autor del libro: ");
+        String autor = input.nextLine().trim();
+        if (autor.isEmpty()) {
+            System.out.println("El autor no puede estar vacio.");
+            return;
+        }
+        try {
+            Libro libro = new Libro(titulo, autor);
+            biblioteca.agregarLibro(libro); 
+        } catch (Exception e) {
+            System.out.println("Error al agregar el libro: " + e.getMessage());
+        }
+
     }
 
     private static void prestarLibro() {
         System.out.println("Ingrese el titulo del libro: ");
-        String titulo = input.nextLine();
+        String titulo = input.nextLine().trim();
+        if (titulo.isEmpty()) {
+            System.out.println("El titulo no puede estar vacio.");
+            return;
+        }
+
         System.out.println("Ingrese el rut del usuario: ");
         String rut = input.nextLine();
+        if (rut.isEmpty()) {
+            System.out.println("El rut no puede estar vacio.");
+            return;
+        }
 
         try {
             biblioteca.prestarLibro(titulo, rut);
             System.out.println("Prestamo realizado.");
+        } catch (LibroNoEncontradoException | LibroYaPrestadoException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error de usuario: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -107,11 +133,19 @@ public class Menu {
 
     private static void devolverLibro() {
         System.out.println("Ingrese titulo del libro a devolver: ");
-        String titulo = input.nextLine();
+        String titulo = input.nextLine().trim();
+        if (titulo.isEmpty()) {
+            System.out.println("El titulo no puede estar vacio.");
+            return;
+        }
 
         try {
             biblioteca.devolverLibro(titulo);
             System.out.println("Libro devuelto con exito.");
+        } catch (LibroNoEncontradoException e) {
+            System.out.println("Error: " + e.getMessage());
+        } catch (IllegalStateException e) {
+            System.out.println("Error invalido: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
