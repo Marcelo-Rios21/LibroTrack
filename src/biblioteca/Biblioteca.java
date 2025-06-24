@@ -15,15 +15,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Biblioteca {
+    // Lista principal de libros
     private final List<Libro> libros;
-
+    //Mapa de usuarios con clave RUT
     private final Map<String, Usuario> usuarios;
+    //Indice para busqueda directa
     private final Map<String, Libro> indicePorTitulo;
-
+    //Conjunto que previene duplicados de titulos
     private final Set<String> titulosUnicos;
+    //Conjunto que evita duplicados de RUT
     private final Set<String> rutsUnicos;
-
+    //Conjunto ordenado de libros por titulo
     private final TreeSet<Libro> librosOrdenados;
+    //Conjunto ordenado de usuarios por nombre
     private final TreeSet<Usuario> usuariosOrdenados;
 
 
