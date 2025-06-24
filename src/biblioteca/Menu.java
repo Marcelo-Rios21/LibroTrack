@@ -7,6 +7,13 @@ public class Menu {
     private static final Scanner input = new Scanner(System.in);
     private static final Biblioteca biblioteca = new Biblioteca();
 
+    private static final String MSG_ERROR = "Error: ";
+    private static final String MSG_TITULO_VACIO = "El titulo no puede estar vacio.";
+
+    private Menu() {
+        
+    }
+
     public static void mostrarMenu() {
         int opcion = -1;
         do {
@@ -44,7 +51,7 @@ public class Menu {
                     default -> System.out.println("Opcion no valida.");             
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Error: " +e.getMessage());
+                System.out.println(MSG_ERROR + e.getMessage());
                 input.nextLine();
             } catch (Exception e) {
                 System.out.println("Error inesperado: " + e.getMessage());
@@ -66,7 +73,7 @@ public class Menu {
             System.out.println("Ingrese rut del usuario: ");
             rut = input.nextLine().trim();
 
-            if (biblioteca.validarRUT(rut)) {
+            if (Biblioteca.validarRUT(rut)) {
                 break;
             } else {
                 System.out.println("Rut invalido. porfavor corregir a un formato valido.");
@@ -85,7 +92,7 @@ public class Menu {
         System.out.println("Ingrese el titulo del libro: ");
         String titulo = input.nextLine().trim();
         if (titulo.isEmpty()) {
-            System.out.println("El titulo no puede estar vacio.");
+            System.out.println(MSG_TITULO_VACIO);
             return;
         }
 
@@ -108,7 +115,7 @@ public class Menu {
         System.out.println("Ingrese el titulo del libro: ");
         String titulo = input.nextLine().trim();
         if (titulo.isEmpty()) {
-            System.out.println("El titulo no puede estar vacio.");
+            System.out.println(MSG_TITULO_VACIO);
             return;
         }
 
@@ -123,11 +130,11 @@ public class Menu {
             biblioteca.prestarLibro(titulo, rut);
             System.out.println("Prestamo realizado.");
         } catch (LibroNoEncontradoException | LibroYaPrestadoException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(MSG_ERROR + e.getMessage());
         } catch (IllegalArgumentException e) {
             System.out.println("Error de usuario: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(MSG_ERROR + e.getMessage());
         }
     }
 
@@ -135,7 +142,7 @@ public class Menu {
         System.out.println("Ingrese titulo del libro a devolver: ");
         String titulo = input.nextLine().trim();
         if (titulo.isEmpty()) {
-            System.out.println("El titulo no puede estar vacio.");
+            System.out.println(MSG_TITULO_VACIO);
             return;
         }
 
@@ -143,11 +150,11 @@ public class Menu {
             biblioteca.devolverLibro(titulo);
             System.out.println("Libro devuelto con exito.");
         } catch (LibroNoEncontradoException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(MSG_ERROR + e.getMessage());
         } catch (IllegalStateException e) {
             System.out.println("Error invalido: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println(MSG_ERROR + e.getMessage());
         }
     }
 
