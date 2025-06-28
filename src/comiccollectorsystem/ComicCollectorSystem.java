@@ -31,26 +31,78 @@ public class ComicCollectorSystem {
     }
 
     public void agregarComic(Comic comic) {
-        //Por implementar
+        if (comic == null) return;
+            String titulo = comic.getTitulo();
+
+            if (titulosUnicos.contains(titulo)) {
+                System.out.println("El titulo ya está registrado");
+                return;
+            }
+
+            comics.add(comic);
+            indicePorTitulo.put(titulo, comic);
+            titulosUnicos.add(titulo);
+            comicsOrdenados.add(comic);
+            System.out.println("Comic agregado con exito");
     }
 
     public void agregarUsuario(Usuario usuario) {
-        //Por implementar
+        if (usuario == null) return;
+
+        String rut = usuario.getRut();
+
+        if (rutsUnicos.contains(rut)) {
+            System.out.println("El RUT ya está registrado.");
+            return;
+        }
+
+        usuarios.put(rut, usuario);
+        rutsUnicos.add(rut);
+        usuariosOrdenados.add(usuario);
+        System.out.println("Usuario registrado exitosamente.");
     }
 
     public List<Comic> listarComicsDisponibles() {
-        //Por implementar
-        return null;
+        List<Comic> disponibles = new ArrayList<>();
+
+        for (Comic comic : comics) {
+            if (!comic.estaPrestado()) {
+                disponibles.add(comic);
+            }
+        }
+        if (disponibles.isEmpty()) {
+            System.out.println("No hay comics disponibles.");
+        }
+
+        return  disponibles;
     }
 
     public Usuario buscarUsuarioPorRut(String rut) {
-        //Por implementar
-        return null;
+        if (rut == null || rut.isEmpty()) {
+            System.out.println("RUT invalido.");
+            return null;
+        }
+        
+        Usuario usuario = usuarios.get(rut);
+
+        if (usuario == null) {
+            System.out.println("Usuario no encontrado.");
+        }
+        return usuario;
     }
 
     public Comic buscarComicPorTitulo(String titulo) {
-        //Por implementar
-        return null;
+        if (titulo == null || titulo.isEmpty()) {
+            System.out.println("Titulo invalido.");
+            return null;
+        }
+
+        Comic comic = indicePorTitulo.get(titulo);
+
+        if (comic == null) {
+            System.out.println("Comic no encontrado.");
+        }
+        return comic;
     }
 
     public boolean prestarComic(String titulo, String rutUsuario) {
