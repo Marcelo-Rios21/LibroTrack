@@ -105,6 +105,63 @@ public class ComicCollectorSystem {
         return comic;
     }
 
+    public void mostrarComicsPorTipo(String tipo) {
+        if (tipo == null || tipo.isEmpty()) {
+            System.out.println("Tipo invalido.");
+            return;
+        }
+
+        boolean encontrado = false;
+
+        for (Comic comic : comics) {
+            if (comic.getTipo().name().equalsIgnoreCase(tipo)) {
+                System.out.println(comic);
+                encontrado = true;
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("No se encontraron comic del tipo: " + tipo);
+        }
+    }
+
+    public void mostrarComicsOrdenados() {
+        if (comicsOrdenados.isEmpty()) {
+            System.out.println("No hay comics registrados.");
+            return;
+        }
+
+        System.out.println("Listado de comics ordenados alfabeticamente:");
+        for (Comic comic : comicsOrdenados) {
+            System.out.println("- " + comic.getTitulo());
+        }
+    }
+
+    public void mostrarUsuariosOrdenados() {
+        if (usuariosOrdenados.isEmpty()) {
+            System.out.println("No hay usuarios registrados en el sistema.");
+            return;
+        }
+
+        System.out.println("Lista de usuarios ordenada por nombre:");
+        for (Usuario usuario : usuariosOrdenados) {
+            System.out.println("- " + usuario.getNombre() + " - Rut: " + usuario.getRut());
+        }
+    }
+
+    public void mostrarUsuariosPorRut() {
+        if (usuarios.isEmpty()) {
+            System.out.println("No hay usuarios registrados.");
+            return;
+        }
+        //Recorre todos los usuarios del sistema
+        //Los ordena por rut
+        usuarios.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
+            Usuario usuario = entry.getValue();
+            System.out.println("rut: " + usuario.getRut() + " , Nombre: " + usuario.getNombre());
+        });
+    }
+
     public boolean prestarComic(String titulo, String rutUsuario) {
         //Por implementar
         return false;
