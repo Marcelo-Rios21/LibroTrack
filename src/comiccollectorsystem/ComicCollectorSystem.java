@@ -15,6 +15,7 @@ public class ComicCollectorSystem {
     private final List<Comic> comics;
     private final Map<String, Usuario> usuarios;
     private final Map<String, Comic> indicePorTitulo;
+    private final Map<String, String> reservas;
     private final Set<String> titulosUnicos;
     private final Set<String> rutsUnicos;
     private final TreeSet<Comic> comicsOrdenados; 
@@ -24,6 +25,7 @@ public class ComicCollectorSystem {
         comics = new ArrayList<>();
         usuarios = new HashMap<>();
         indicePorTitulo = new HashMap<>();
+        reservas = new HashMap<>();
         titulosUnicos = new HashSet<>();
         rutsUnicos = new HashSet<>();
         comicsOrdenados = new TreeSet<>(Comparator.comparing(Comic::getTitulo));
@@ -162,13 +164,107 @@ public class ComicCollectorSystem {
         });
     }
 
-    public boolean prestarComic(String titulo, String rutUsuario) {
-        //Por implementar
-        return false;
+    public boolean reservarComic(String titulo, String rutUsuario) {
+        if (titulo == null || rutUsuario == null || titulo.isEmpty() || rutUsuario.isEmpty()) {
+            System.out.println("Titulo o rut invalido.");
+            return false;
+        }
+        
+        Comic comic = buscarComicPorTitulo(titulo);
+        if (comic == null) {
+            return false;
+        }
+
+        if (reservas.containsKey(titulo)) {
+            System.out.println("Este comic ya esta reservado por otro usuario.");
+            return false;
+        }
+
+        if (!usuarios.containsKey(rutUsuario)) {
+            System.out.println("El usuario no esta registrado.");
+            return false;
+        }
+
+        reservas.put(titulo, rutUsuario);
+        System.out.println("Reserva realizada exitosamente.");
+        return true;
     }
 
-    public void devolverComic(String titulo) {
-        //Por implementar
+    public boolean cancelarReserva(String titulo, String rutUsuario) {
+        if (titulo == null || rutUsuario == null || titulo.isEmpty() || rutUsuario.isEmpty()) {
+            System.out.println("Titulo o rut invalido.");
+            return false;
+        }
+
+        if (!reservas.containsKey(titulo)) {
+            System.out.println("Este comic no tiene reservas.");
+            return false;
+        }
+
+        String rutReserva = reservas.get(titulo);
+        if (!rutReserva.equals(rutUsuario)) {
+            System.out.println("No puedes cancelar esta reserva porque pertenece a otro usuario.");
+            return false;
+        }
+
+        reservas.remove(titulo);
+        System.out.println("Reserva cancelada exitosamente.");
+        return true;
+    }
+
+    public boolean venderComic(String titulo, String rutUsuario) {
+        if (titulo == null || rutUsuario == null || titulo.isEmpty() || rutUsuario.isEmpty()) {
+            System.out.println("Titulo o rut invalido.");
+            return false;
+        }
+
+        Comic comic = indicePorTitulo.get(titulo);
+        if (comic == null) {
+            System.out.println("Comic no encontrado.");
+            return false;
+        }
+
+        if (reservas.containsKey(titulo)) {
+            String rutReservante = reservas.get(titulo);
+            if (!rutReservante.equals(rutUsuario)) {
+                System.out.println("Este comic esta reservado por otro usuario.");
+                return false;
+            } else {
+                reservas.remove(titulo);
+            }
+        }
+
+        comics.remove(comic);
+        indicePorTitulo.remove(titulo);
+        titulosUnicos.remove(titulo);
+
+        System.out.println("Comic vendido exitosamente a " + rutUsuario + ".");
+        return true;
+    }
+
+    public void mostrarComicsReservadosPorUsuario(String rutUsuario) {
+        if (rutUsuario == null || rutUsuario.isEmpty()) {
+            System.out.println("Rut invalido.");
+            return;
+        }
+
+        boolean encontrado = false;
+        for (Map.Entry<String, String> entrada : reservas.entrySet()) {
+            String tituloComic = entrada.getKey();
+            String rutReservante = entrada.getValue();
+
+            if (rutUsuario.equals(rutReservante)) {
+                Comic comic = indicePorTitulo.get(tituloComic);
+                if (comic != null) {
+                    System.out.println(comic);
+                    encontrado = true;
+                }
+            }
+        }
+
+        if (!encontrado) {
+            System.out.println("El usuario no tiene comics reservados.");
+        }
     }
 
     public void guardarUsuariosEnArchivo(String rutaArchivo) {
