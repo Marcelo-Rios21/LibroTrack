@@ -18,7 +18,7 @@ public class Menu {
         int opcion = -1;
         do {
             try {
-                System.out.println("\n----- MENU PRINCIPAL -----");
+                System.out.println("\n----- MENU PRINCIPAL DE LA BIBLIOTECA -----");
                 System.out.println("1. Registrar usuario");
                 System.out.println("2. Agregar libro");
                 System.out.println("3. Prestar libro");

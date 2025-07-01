@@ -1,9 +1,8 @@
-
-import biblioteca.Menu;
+import sistema.SistemaPrincipal;
 
 public class LibroTrack {
     public static void main(String[] args) {
-        Menu.mostrarMenu();
+        SistemaPrincipal.mostrarMenuPrincipal();
 
     }
 }

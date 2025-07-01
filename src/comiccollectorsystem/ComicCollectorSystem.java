@@ -1,7 +1,12 @@
 package comiccollectorsystem;
 
 import biblioteca.Comic;
+import biblioteca.Comic.TipoComic;
 import biblioteca.Usuario;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,20 +69,19 @@ public class ComicCollectorSystem {
         System.out.println("Usuario registrado exitosamente.");
     }
 
-    public List<Comic> listarComicsDisponibles() {
-        List<Comic> disponibles = new ArrayList<>();
-
-        for (Comic comic : comics) {
-            if (!comic.estaPrestado()) {
-                disponibles.add(comic);
-            }
+    public void mostrarComicsDisponibles() {
+    boolean hayDisponibles = false;
+    for (Comic c : comics) {
+        if (!reservas.containsKey(c.getTitulo())) {
+            hayDisponibles = true;
+            System.out.println(c);
         }
-        if (disponibles.isEmpty()) {
-            System.out.println("No hay comics disponibles.");
-        }
-
-        return  disponibles;
     }
+    if (!hayDisponibles) {
+        System.out.println("No hay comics disponibles.");
+    }
+}
+
 
     public Usuario buscarUsuarioPorRut(String rut) {
         if (rut == null || rut.isEmpty()) {
@@ -105,63 +109,6 @@ public class ComicCollectorSystem {
             System.out.println("Comic no encontrado.");
         }
         return comic;
-    }
-
-    public void mostrarComicsPorTipo(String tipo) {
-        if (tipo == null || tipo.isEmpty()) {
-            System.out.println("Tipo invalido.");
-            return;
-        }
-
-        boolean encontrado = false;
-
-        for (Comic comic : comics) {
-            if (comic.getTipo().name().equalsIgnoreCase(tipo)) {
-                System.out.println(comic);
-                encontrado = true;
-            }
-        }
-
-        if (!encontrado) {
-            System.out.println("No se encontraron comic del tipo: " + tipo);
-        }
-    }
-
-    public void mostrarComicsOrdenados() {
-        if (comicsOrdenados.isEmpty()) {
-            System.out.println("No hay comics registrados.");
-            return;
-        }
-
-        System.out.println("Listado de comics ordenados alfabeticamente:");
-        for (Comic comic : comicsOrdenados) {
-            System.out.println("- " + comic.getTitulo());
-        }
-    }
-
-    public void mostrarUsuariosOrdenados() {
-        if (usuariosOrdenados.isEmpty()) {
-            System.out.println("No hay usuarios registrados en el sistema.");
-            return;
-        }
-
-        System.out.println("Lista de usuarios ordenada por nombre:");
-        for (Usuario usuario : usuariosOrdenados) {
-            System.out.println("- " + usuario.getNombre() + " - Rut: " + usuario.getRut());
-        }
-    }
-
-    public void mostrarUsuariosPorRut() {
-        if (usuarios.isEmpty()) {
-            System.out.println("No hay usuarios registrados.");
-            return;
-        }
-        //Recorre todos los usuarios del sistema
-        //Los ordena por rut
-        usuarios.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(entry -> {
-            Usuario usuario = entry.getValue();
-            System.out.println("rut: " + usuario.getRut() + " , Nombre: " + usuario.getNombre());
-        });
     }
 
     public boolean reservarComic(String titulo, String rutUsuario) {
@@ -268,10 +215,58 @@ public class ComicCollectorSystem {
     }
 
     public void guardarUsuariosEnArchivo(String rutaArchivo) {
-        //Por implementar
+        try (FileWriter writer = new FileWriter(rutaArchivo)) {
+            for (Usuario usuario : usuarios.values()) {
+                writer.write(usuario.getRut() + "," + usuario.getNombre() + "\n");
+            }
+            System.out.println("Usuarios guardados correctamente en el archivo: " + rutaArchivo);
+        } catch (IOException e) {
+            System.out.println("Error al escribir en el archivo: " + e.getMessage());
+        }
     }
 
-    public void cargarComicsDesdeCSV(String rutaArchivo) {
-        //Por implementar
+    public void cargarComicsDesdeCSV(String rutaArchivo, boolean limpiarAntes) {
+        if (limpiarAntes) {
+        comics.clear();
+        indicePorTitulo.clear();
+        titulosUnicos.clear();
+        comicsOrdenados.clear();
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea;
+            boolean primeraLinea = true;
+
+            while ((linea = br.readLine()) != null) {
+                if (primeraLinea) {
+                    primeraLinea = false;
+                    continue;
+                }
+
+                String[] partes = linea.split(",");
+
+                if (partes.length >= 3) {
+                    String titulo = partes[0].trim();
+                    String autor = partes[1].trim();
+                    String tipoTexto = partes[2].trim().toUpperCase();
+                    int numeroEdicion = Integer.parseInt(partes[3].trim());
+                    boolean esRaro = Boolean.parseBoolean(partes[4].trim());
+                    String editorial = partes[5].trim();
+
+                    try {
+                        TipoComic tipo = TipoComic.valueOf(tipoTexto);
+                        Comic comic = new Comic(titulo, autor, tipo, numeroEdicion, esRaro, editorial);
+
+                        agregarComic(comic);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Tipo de comic invalido: " + tipoTexto + ". Linea ignorada.");
+                    }
+                }
+            }
+
+            System.out.println("Carga de comics completada desde archivo: " + rutaArchivo);
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + e.getMessage());
+        }
     }
 }
